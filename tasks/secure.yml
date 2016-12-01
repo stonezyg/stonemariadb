@@ -9,7 +9,7 @@
   command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = "root" ORDER BY (Host="localhost") ASC'
   register: mariadb_root_hosts
   changed_when: false
-  always_run: true
+  check_mode: no
 
 - name: Update MariaDB root password for localhost root account.
   mysql_user:
@@ -19,6 +19,12 @@
     state: present
   with_items: "{{ mariadb_root_hosts.stdout_lines|default([]) }}"
   when: mariadb_root_password_update
+  notify: restart mariadb
+
+
+- name: root password is present
+  mysql_user: name=root host={{item}} password={{mariadb_root_password | mandatory}} state=present
+  with_items: "{{ mariadb_root_hosts.stdout_lines|default([]) }}"
 
 # Has to be after the root password assignment, for idempotency.
 - name: Copy .my.cnf file with root password credentials.
@@ -29,18 +35,12 @@
     group: root
     mode: 0600
 
-- name: Get list of hosts for the anonymous user.
-  command: mysql -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
-  register: mariadb_anonymous_hosts
-  changed_when: false
-  always_run: true
-
 - name: Remove anonymous MariaDB users.
   mysql_user:
      name: ""
      host: "{{ item }}"
      state: absent
-  with_items: "{{ mariadb_anonymous_hosts.stdout_lines|default([]) }}"
+  with_items: "{{ mariadb_root_hosts.stdout_lines|default([]) }}"
 
 - name: Remove MariaDB test database.
   mysql_db:

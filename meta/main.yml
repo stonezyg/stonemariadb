@@ -15,4 +15,4 @@ galaxy_info:
     - web
     - development
   dependencies:
-    - { role: base }
+    - damienlagae.base
