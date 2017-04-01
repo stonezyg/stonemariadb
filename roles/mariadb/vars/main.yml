@@ -1,0 +1,7 @@
+---
+mariadb_slow_query_log_file: /var/log/mysql-slow.log
+mariadb_log_error: /var/log/mariadb/mariadb.log
+mariadb_syslog_tag: mariadb
+mariadb_pid_file: /var/run/mariadb/mariadb.pid
+mariadb_socket: /var/lib/mysql/mysql.sock
+mariadb_supports_innodb_large_prefix: true

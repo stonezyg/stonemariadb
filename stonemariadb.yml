@@ -1,0 +1,9 @@
+---
+- name: install and config mariadb 
+  hosts: all
+  remote_user: root
+#  gather_facts: False
+  vars_files:
+    - vars/main.yml
+  roles:       
+  - mariadb
